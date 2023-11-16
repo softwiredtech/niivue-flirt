@@ -4,6 +4,7 @@ import flirtWasm from "./flirt.wasm?url"
 
 let referenceVolumeBuffer = null
 let inputVolumeBuffer = null
+let processing = false
 
 function fixWasmUrl(flirtWasmUrl) {
     let idDoubleSlash = flirtWasmUrl.lastIndexOf("//");
@@ -13,32 +14,38 @@ function fixWasmUrl(flirtWasmUrl) {
 }
 
 function processImage(worker, input, reference) {
+    processing = true;
+    document.getElementById("options").innerHTML = "Processing...";
     let args = ["-in", "vol.nii", "-ref", "vol_ref.nii", "-out", "out/vol_reg.nii"].concat(getCLIArgumentsFromModal());
     console.log(args);
     worker.postMessage({files: [{name: "vol.nii", data: new Uint8Array(input)}, {name: "vol_ref.nii", data: new Uint8Array(reference)}], args: args, wasmPath: fixWasmUrl(flirtWasm)});
 }
 
-function setVolume(nv, buffer) {
-    let vol = new NVImage(buffer);
-    nv.setVolume(vol, 0);
-}
 
 function initFlirtWorker(nv, worker) {
     worker.addEventListener("message", async function(e) {
-        setVolume(nv, e.data[0].data);
+        nv.setVolume(new NVImage(e.data[0].data), 1);
+        processing = false;
+        document.getElementById("options").innerHTML = "Options";
     });
 	
     worker.addEventListener("onerror", function(error) {
         console.log(error.message);
+        processing = false;
+        document.getElementById("options").innerHTML = "Options";
     });
 }
 
-async function handleFileSelection(reference, event, nv) {
+async function handleFileSelection(reference, pos, event, nv) {
     const file = event.target.files[0];
 
     if (file) {
         let volume = await NVImage.loadFromFile(file);
-        nv.setVolume(volume, 0);
+        console.log(pos);
+        nv.addVolume(volume);
+        if (!reference) {
+            nv.setOpacity(0, 0.0);
+        }
         const reader = new FileReader();
         reader.onload = function(fileEvent) {
             if (reference) {
@@ -73,11 +80,13 @@ function getCLIArgumentsFromModal() {
 
     document.getElementById("fileSelectionInput").addEventListener("click", (e) => {
         e.preventDefault();
+        if (processing) { return; }
         fileInput.click();
     });
 
     document.getElementById("fileSelectionReference").addEventListener("click", (e) => {
         e.preventDefault();
+        if (processing) { return; }
         fileReference.click();
     });
 
@@ -87,14 +96,29 @@ function getCLIArgumentsFromModal() {
         modal.style.display = 'none';
     });
 
-    fileInput.addEventListener("change", (event) => handleFileSelection(/*reference*/false, event, nv));
-    fileReference.addEventListener("change", (event) => handleFileSelection(/*reference*/true, event, nv));
+    let pos = 0;
+
+    fileInput.addEventListener("change", (event) => {
+        handleFileSelection(/*reference*/false, pos, event, nv)
+        if (pos == 1) {
+            sliderContainer.classList.remove("hidden");
+        }
+        pos = pos == 0 ? 1 : 0;
+    });
+    fileReference.addEventListener("change", (event) => {
+        handleFileSelection(/*reference*/true, pos, event, nv)
+        if (pos == 1) {
+            sliderContainer.classList.remove("hidden");
+        }
+        pos = pos == 0 ? 1 : 0;
+    });
 
     const modal = document.getElementById('flirtModal');
     const closeModalButton = document.getElementById('closeModal');
     
     document.getElementById("options").addEventListener("click", function(e) {
         e.preventDefault();
+        if (processing) { return; }
         modal.style.display = 'block';
     });
 
@@ -104,6 +128,12 @@ function getCLIArgumentsFromModal() {
 
     initFlirtWorker(nv, worker);
     nv.attachToCanvas(canvas);
+
+    volumeSelector.oninput = function () {
+        let opacity = this.value / 100;
+        nv.setOpacity(1, opacity);
+        nv.setOpacity(0, 1.0-opacity);
+    };
 
     runFlirt.addEventListener("click", function(e) {
         processImage(worker, inputVolumeBuffer, referenceVolumeBuffer);

@@ -6,36 +6,46 @@
     <link rel="icon" href="./favicon.ico" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 
-    <style>
-        .link-container {
-            position: absolute;
-            top: 10%;
-            left: 0;
+    <style> 
+        .slider-container {
             display: flex;
-            flex-direction: column;
-            gap: 1em;
-            padding-left: 10px;
-            font-family: 'Roboto', sans-serif;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            background-color: transparent;
         }
 
-        .overlay-link {
-            text-decoration: none;
-            background-color: #fff;
-            padding: 0.5em 1em;
-            border-radius: 4px;
-            color: #0f0f0f;
-            transition: background-color 0.3s, color 0.3s;
-            text-align: center;
+        input[type="range"] {
+            -webkit-appearance: none; 
+            appearance: none;
+            width: 30%;
+            height: 10px;
+            background: #888;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
         }
 
-        .overlay-link:hover {
-            background-color: #383838;
-            color: #fff;
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            cursor: pointer;
+            border-radius: 50%;
         }
 
-        .overlay-link.selected {
-            background-color: #383838;
-            color: #fff;
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        input[type="range"]:hover {
+            opacity: 1;
         }
 
         .modal {
@@ -100,7 +110,6 @@
 
         body, h1, h2, h3, p, ul, li {
             padding: 0;
-            margin: 0;
         }
 
         .navbar {
@@ -109,6 +118,7 @@
             background-color: #0f0f0f;
             padding: 1em;
             box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
             font-family: 'Roboto', sans-serif;
         }
 
@@ -198,13 +208,17 @@
     <div class="navbar">
         <div class="title">NiiVue FLIRT</div>
         <ul>
-            <li><a id="fileSelectionInput" href="#">Select input</a></li>
             <li><a id="fileSelectionReference" href="#">Select reference</a></li>
+            <li><a id="fileSelectionInput" href="#">Select input</a></li>
             <li><a id="options" href="#">Options</a></li>
         </ul>
     </div>
 
     <canvas id="gl" height="480" width="640"></canvas>
+
+    <div id="sliderContainer" class="slider-container hidden">
+        <input type="range" id="volumeSelector" min="0" max="100" value="100">
+    </div>
 
     <script type="module" src="./main.js"></script>
 </body>
