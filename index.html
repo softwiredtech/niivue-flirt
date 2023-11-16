@@ -7,19 +7,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 
     <style>
-        /* Style for the links container */
         .link-container {
             position: absolute;
-            top: 10%;  /* Moved closer to the navbar */
+            top: 10%;
             left: 0;
             display: flex;
             flex-direction: column;
             gap: 1em;
             padding-left: 10px;
-            font-family: 'Roboto', sans-serif; /* Updated font to match the site */
+            font-family: 'Roboto', sans-serif;
         }
 
-        /* Style for the individual links */
         .overlay-link {
             text-decoration: none;
             background-color: #fff;
@@ -27,7 +25,7 @@
             border-radius: 4px;
             color: #0f0f0f;
             transition: background-color 0.3s, color 0.3s;
-            text-align: center;  /* Centered the link text */
+            text-align: center;
         }
 
         .overlay-link:hover {
@@ -40,7 +38,6 @@
             color: #fff;
         }
 
-        /* General Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -48,9 +45,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.6); /* Slightly darker background overlay */
+            background-color: rgba(0, 0, 0, 0.6);
             z-index: 1000;
-            font-family: 'Arial', sans-serif; /* You can choose another font if desired */
+            font-family: 'Arial', sans-serif;
         }
 
         .modal-content {
@@ -64,10 +61,9 @@
             max-width: 500px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 6px 6px rgba(0, 0, 0, 0.23);
             border-radius: 10px;
-            transition: transform 0.3s; /* Adds a zoom effect on modal open/close */
+            transition: transform 0.3s;
         }
 
-        /* Label & Input Styles */
         .modal-content label {
             display: block;
             margin: 20px 0;
@@ -80,14 +76,13 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 14px;
-            transition: border-color 0.3s; /* Adds a smooth transition effect */
+            transition: border-color 0.3s;
         }
 
         .modal-content input[type="checkbox"] {
             margin-right: 10px;
         }
 
-        /* Button Styles */
         .modal-content button {
             padding: 10px 20px;
             border: none;
@@ -95,25 +90,23 @@
             color: white;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s; /* Adds a smooth hover effect */
-            margin-right: 10px; /* Spacing between buttons */
+            transition: background-color 0.3s;
+            margin-right: 10px;
         }
 
         .modal-content button:hover {
             background-color: #555;
         }
 
-        /* Reset default padding and margins */
         body, h1, h2, h3, p, ul, li {
             padding: 0;
             margin: 0;
         }
 
-        /* Navbar styles */
         .navbar {
             display: flex;
             align-items: center;
-            background-color: #0f0f0f;  /* Black */
+            background-color: #0f0f0f;
             padding: 1em;
             box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
             font-family: 'Roboto', sans-serif;
@@ -121,7 +114,7 @@
 
         .navbar .title {
             font-size: 1.5em;
-            color: white;  /* White for contrast against black */
+            color: white;
             font-weight: 500;
             margin-right: 2em;
         }
@@ -140,13 +133,25 @@
             text-decoration: none;
             padding: 0.5em 1em;
             border-radius: 4px;
-            background-color: rgba(255, 255, 255, 0.1);  /* Slight white transparency for differentiation */
-            color: white;  /* White for visibility against black */
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
             transition: background-color 0.3s;
         }
 
         .navbar ul li a:hover {
-            background-color: rgba(255, 255, 255, 0.2);  /* Slightly increased white transparency on hover */
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .form-row label {
+            min-width: 150px;
+            margin: 0;
         }
 
         .hidden {
@@ -159,26 +164,30 @@
     <div id="flirtModal" class="modal">
         <div class="modal-content">
             <h2>FLIRT Options</h2>
-            <form id="flirtForm">
-                <label for="costFunction">Cost Function:</label>
-                <select id="costFunction" name="cost">
-                    <option value="mutualinfo" selected>Mutual Info</option>
-                    <option value="corratio">Correlation Ratio</option>
-                    <option value="normcorr">Normalized Correlation</option>
-                    <option value="normmi">Normalized Mutual Info</option>
-                    <option value="leastsq">Least Squares</option>
-                </select>
+            <form id="flirtForm" style="margin-top: 20px;">
+                <div class="form-row">
+                    <label for="costFunction">Cost Function:</label>
+                    <select id="costFunction" name="cost" style="width:150px;">
+                        <option value="mutualinfo" selected>Mutual Info</option>
+                        <option value="corratio">Correlation Ratio</option>
+                        <option value="normcorr">Normalized Correlation</option>
+                        <option value="normmi">Normalized Mutual Info</option>
+                        <option value="leastsq">Least Squares</option>
+                    </select>
+                </div>
 
-                <label for="degreeOfFreedom">Degree of Freedom:</label>
-                <select id="degreeOfFreedom" name="dof">
-                    <option value="6" selected>6</option>
-                    <option value="7">7</option>
-                    <option value="9">9</option>
-                    <option value="12">12</option>
-                </select>
+                <div class="form-row">
+                    <label for="degreeOfFreedom">Degree of Freedom:</label>
+                    <select id="degreeOfFreedom" name="dof" style="width:150px;">
+                        <option value="6" selected>6</option>
+                        <option value="7">7</option>
+                        <option value="9">9</option>
+                        <option value="12">12</option>
+                    </select>
+                </div>
             </form>
-            <button id="runFlirt">Run</button>
-            <button id="closeModal">Close</button>
+            <button id="runFlirt" style="margin-top: 20px;">Run</button>
+            <button id="closeModal" style="margin-top: 20px;">Close</button>
         </div>
     </div>
 
