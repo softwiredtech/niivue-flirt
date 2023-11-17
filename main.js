@@ -5,7 +5,7 @@ import flirtWasm from "./flirt.wasm?url"
 let referenceVolumeBuffer = null
 let inputVolumeBuffer = null
 let processing = false
-
+let volumePositions = {}
 function fixWasmUrl(flirtWasmUrl) {
     let idDoubleSlash = flirtWasmUrl.lastIndexOf("//");
     let idLastSlash =  flirtWasmUrl.lastIndexOf("/");
@@ -24,7 +24,7 @@ function processImage(worker, input, reference) {
 
 function initFlirtWorker(nv, worker) {
     worker.addEventListener("message", async function(e) {
-        nv.setVolume(new NVImage(e.data[0].data), 1);
+        nv.setVolume(new NVImage(e.data[0].data), volumePositions["in"]);
         processing = false;
         document.getElementById("options").innerHTML = "Options";
     });
@@ -36,19 +36,29 @@ function initFlirtWorker(nv, worker) {
     });
 }
 
-async function handleFileSelection(reference, pos, event, nv) {
+async function handleFileSelection(volId, event, nv) {
     const file = event.target.files[0];
 
     if (file) {
         let volume = await NVImage.loadFromFile(file);
-        console.log(pos);
-        nv.addVolume(volume);
-        if (!reference) {
-            nv.setOpacity(0, 0.0);
+
+        if (volumePositions[volId] === undefined) {
+            volumePositions[volId] = nv.volumes.length;
+            nv.addVolume(volume);
+            console.log(volumePositions);
+        } else {
+            nv.removeVolume(nv.volumes[volumePositions[volId]]);
+            nv.addVolume(volume);
+            nv.setVolume(volume, volumePositions[volId]);
         }
+
+        if (nv.volumes.length == 2) {
+            document.getElementById("sliderContainer").classList.remove("hidden");
+        }
+
         const reader = new FileReader();
         reader.onload = function(fileEvent) {
-            if (reference) {
+            if (volId === "ref") {
                 referenceVolumeBuffer = fileEvent.target.result;
             } else {
                 inputVolumeBuffer = fileEvent.target.result;
@@ -73,7 +83,6 @@ function getCLIArgumentsFromModal() {
 }
 
  window.onload = async () => {
-    console.log(getCLIArgumentsFromModal());
     const canvas = document.getElementById('gl');
     const worker = new FlirtWorker();
     const nv = new Niivue();
@@ -81,12 +90,14 @@ function getCLIArgumentsFromModal() {
     document.getElementById("fileSelectionInput").addEventListener("click", (e) => {
         e.preventDefault();
         if (processing) { return; }
+        fileInput.value = null;
         fileInput.click();
     });
 
     document.getElementById("fileSelectionReference").addEventListener("click", (e) => {
         e.preventDefault();
         if (processing) { return; }
+        fileReference.vaue = null;
         fileReference.click();
     });
 
@@ -96,22 +107,8 @@ function getCLIArgumentsFromModal() {
         modal.style.display = 'none';
     });
 
-    let pos = 0;
-
-    fileInput.addEventListener("change", (event) => {
-        handleFileSelection(/*reference*/false, pos, event, nv)
-        if (pos == 1) {
-            sliderContainer.classList.remove("hidden");
-        }
-        pos = pos == 0 ? 1 : 0;
-    });
-    fileReference.addEventListener("change", (event) => {
-        handleFileSelection(/*reference*/true, pos, event, nv)
-        if (pos == 1) {
-            sliderContainer.classList.remove("hidden");
-        }
-        pos = pos == 0 ? 1 : 0;
-    });
+    fileReference.addEventListener("change", (event) => handleFileSelection("ref", event, nv));
+    fileInput.addEventListener("change", (event) => handleFileSelection("in", event, nv));
 
     const modal = document.getElementById('flirtModal');
     const closeModalButton = document.getElementById('closeModal');
@@ -131,8 +128,8 @@ function getCLIArgumentsFromModal() {
 
     volumeSelector.oninput = function () {
         let opacity = this.value / 100;
-        nv.setOpacity(1, opacity);
-        nv.setOpacity(0, 1.0-opacity);
+        nv.setOpacity(volumePositions["in"], opacity);
+        nv.setOpacity(volumePositions["ref"], 1.0-opacity);
     };
 
     runFlirt.addEventListener("click", function(e) {
