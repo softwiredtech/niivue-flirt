@@ -45,7 +45,6 @@ async function handleFileSelection(volId, event, nv) {
         if (volumePositions[volId] === undefined) {
             volumePositions[volId] = nv.volumes.length;
             nv.addVolume(volume);
-            console.log(volumePositions);
         } else {
             nv.removeVolume(nv.volumes[volumePositions[volId]]);
             nv.addVolume(volume);
