@@ -15,6 +15,12 @@
             background-color: transparent;
         }
 
+        .slider-container label {
+            color: #888;
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+        }
+
         input[type="range"] {
             -webkit-appearance: none; 
             appearance: none;
@@ -168,7 +174,7 @@
             display: none;
         }
     </style>
-  <script type="module" crossorigin src="/niivue-flirt/assets/index.6fec4d31.js"></script>
+  <script type="module" crossorigin src="/niivue-flirt/assets/index.6d1fd9d8.js"></script>
 </head>
 
 <body>
@@ -218,10 +224,9 @@
     <canvas id="gl" height="480" width="640"></canvas>
 
     <div id="sliderContainer" class="slider-container hidden">
-        <input type="range" id="volumeSelector" min="0" max="100" value="100">
+        <label for="volumeSelector" style="margin-right: 10px;">Reference</label>
+        <input type="range" id="volumeSelector" min="0" max="100" value="50">
+        <label for="volumeSelector" style="margin-left: 10px;">Input</label>
     </div>
-
-    
 </body>
-
 </html>
